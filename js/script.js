@@ -1,62 +1,25 @@
-
-// $("body").pullToRefresh();
-
+var address = "0xc0cdbbf7433149a65ad4e11f9fae785dda8724a6";
+var contract = "0xd26114cd6ee289accf82350c8d8487fedb8a0c07";
+var etherscanApiKey = "PPY88V5EDNB531PH4Y4MK2KHH59DKXYH63";
+var symbol = "OMG";
+var ethPrice;
 const targetApi = 'https://mainnet.infura.io/';
 const web3 = new Web3(new Web3.providers.HttpProvider(targetApi));
+
+
 function format(value, decimals) {
     while(value.length <= decimals) value = "0" + value;
     var ans = value.slice(0,value.length-decimals) + "."+ value.slice(value.length-decimals,value.length-decimals+1);
     if(ans.charAt(0) == '.') ans = "0" + ans;
     return ans;
 }
-// var address = "0xa81A143D7664B047c925171E7104805717D8b002";
 
-// localStorage.setItem("public_key", "0xc0cdbbf7433149a65ad4e11f9fae785dda8724a6");
-// localStorage.getItem("public_key");
-var address = "0xc0cdbbf7433149a65ad4e11f9fae785dda8724a6";
-var contract = "0xd26114cd6ee289accf82350c8d8487fedb8a0c07";
-var symbol = "OMG";
-var ethPrice;
-
-// var href = window.location.href;
-// var splits = href.split(window.location.origin + "/token/address/");
-// if(splits.length>=2 && splits[splits.length-1] != "" && splits[splits.length-1].substr(0,2) == "0x")
-//   address = splits[splits.length-1];
-//
-// window.history.pushState(address, 'Token', '/token/address/'+address);
-
-// window.onpopstate = function(event) {
-//   if(history.state.substr(0,2) == "0x") {
-//     address = history.state;
-//   } else {
-//     window.history.pushState(address, 'Token', '/token/address/'+address);
-//   }
-//   $("#address").val(address);
-//   $("#addressTitle").text(address);
-//   $("#submit").trigger('click');
-// };
-
+// Get ether price in usd
 $.getJSON('https://api.coinmarketcap.com/v1/ticker/ethereum/?convert=EUR', function(data){
   ethPrice = parseFloat(data[0].price_usd);
 });
 
-// $(document).on('click', 'a', function(e){
-//   e.preventDefault();
-//   var add = $(this).attr('href');
-//   $("#address").val(add);
-//   $("#addressTitle").text(add);
-//   $("#submit").trigger('click');
-// });
-$("#address").on('keyup', function (e) {
-  if (e.keyCode == 13) {
-    $("#submit").trigger('click');
-  }
-});
-$("#submit").click(function(){
-  // window.history.pushState($("#address").val(), 'Token', '/token/address/'+$("#address").val());
-  renderBalance($("#address").val())
-  renderTransactions($("#address").val());
-});
+// Add loader to div with id
 function preloader(id, color) {
 
     $(id).html(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="400" height="100">
@@ -75,26 +38,33 @@ function preloader(id, color) {
     </svg>`);
 
 }
-function renderBalance(address) {
-  preloader("#balance", '#fff');
-  $.getJSON(`https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${contract}&address=${address}&tag=latest&apikey=PPY88V5EDNB531PH4Y4MK2KHH59DKXYH63`, function(data){
-      $("#balance").html(`<span id="myBalance">${format(data.result, 18)}</span> <span id="tokenSymbol">${symbol}</span>`);
-  });
 
+function renderBalance(contractAddress, address) {
+  preloader("#balance", '#fff');
+  $.getJSON(`https://api.etherscan.io/api?module=account&action=tokenbalance&contractaddress=${contractAddress}&address=${address}&tag=latest&apikey=${etherscanApiKey}`, function(data){
+      $("#balance").html(`<span id="myBalance">${format(data.result, 18)}</span> <span id="tokenSymbol">${symbol}</span>`);
+      console.log(format(data.result, 18))
+  });
 }
-function renderTransactions(address) {
+
+function renderTransactions(contractAddress, address) {
   preloader("#myTransactions", '#1C497A');
-  $.getJSON(`https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=4042013&toBlock=latest&address=${contract}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&apikey=PPY88V5EDNB531PH4Y4MK2KHH59DKXYH63&topic1_2_opr=or&topic1=0x000000000000000000000000${address.substr(2)}&topic2=0x000000000000000000000000${address.substr(2)}`, function(data){
+  $.getJSON(`https://api.etherscan.io/api?module=logs&action=getLogs&fromBlock=4042013&toBlock=latest&address=${contractAddress}&apikey=${etherscanApiKey}&topic0=0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef&topic1_2_opr=or&topic1=0x000000000000000000000000${address.substr(2)}&topic2=0x000000000000000000000000${address.substr(2)}`, function(data){
+    if(data.status!="1") {
+      console.log("Couldn't get transactions");
+      return;
+    }
     var transactions = data.result.reverse();
+    console.log(transactions);
     var transactionsView = "";
     transactions.forEach(function(t) {
-      // console.log(t);
+
       var a = "0x" + t.data.substring(2,t.data.length).replace(/^0+/, '');
       a = new web3.BigNumber(a).toString(10);
       var gasPrice = new web3.BigNumber(t.gasPrice);
       var gasUsed = new web3.BigNumber(t.gasUsed);
       var total = parseFloat(format(gasPrice.mul(gasUsed).toString(10),18))*ethPrice;
-      // totat = total.toFixed(2);
+
       total = parseFloat(total).toFixed(2);
 
 
@@ -114,22 +84,24 @@ function renderTransactions(address) {
         </div>
       </li>`;
 
-        // transactionsView += `<div class="row">
-        //                       <div class="col-6 col-xs-6 col-sm-6 col-md-6">
-        //                         ${new moment(parseInt(t.timeStamp,16)*1000).format("DD/MM/YY HH:mm:ss")}
-        //                       </div>
-        //                       <div class="col-6 col-xs-6 col-sm-6 col-md-6 text-right">
-        //                         <span class='label label-${other==from?'success':'warning'}'>${other==from?'':'-'}${format(a,18)} ${symbol}</span>
-        //                       </div>
-        //                     </div>
-        //                     <div class="row">
-        //                       <div class="col-6 col-xs-6 col-sm-6 col-md-6">
-        //                         <small><a href='${other}'>${other.substr(0,other.length/3)}...</a></small>
-        //                       </div>
-        //                       <div class="col-6 col-xs-6 col-sm-6 col-md-6 text-right">
-        //                         <small>Tx fee: ${total} EUR</small>
-        //                         </div>
-        //                     </div><hr/>`;
+        /*
+        transactionsView += `<div class="row">
+                              <div class="col-6 col-xs-6 col-sm-6 col-md-6">
+                                ${new moment(parseInt(t.timeStamp,16)*1000).format("DD/MM/YY HH:mm:ss")}
+                              </div>
+                              <div class="col-6 col-xs-6 col-sm-6 col-md-6 text-right">
+                                <span class='label label-${other==from?'success':'warning'}'>${other==from?'':'-'}${format(a,18)} ${symbol}</span>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-6 col-xs-6 col-sm-6 col-md-6">
+                                <small><a href='${other}'>${other.substr(0,other.length/3)}...</a></small>
+                              </div>
+                              <div class="col-6 col-xs-6 col-sm-6 col-md-6 text-right">
+                                <small>Tx fee: ${total} EUR</small>
+                                </div>
+                            </div><hr/>`;
+        */
 
     })
 
@@ -137,6 +109,9 @@ function renderTransactions(address) {
 
   });
 }
+
+// Under development
+
 function parseData(to, value) {
   value = value * (10**18);
   value = value.toString(16);
@@ -149,6 +124,7 @@ function parseData(to, value) {
   ans += value;
   return ans;
 }
+
 function sendTokenTransaction(from, pk, to, value) {
   var privateKey = EthJS.Buffer.Buffer(pk, 'hex')
 
