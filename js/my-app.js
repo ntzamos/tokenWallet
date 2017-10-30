@@ -32,12 +32,12 @@ function changeAddress(add) {
 	qrcode.makeCode(address);
   $("#myaddress").text(address);
 
-  renderBalance(address)
-  renderTransactions(address);
+  renderBalance(contract, address)
+  renderTransactions(contract, address);
 }
 
 function qrScan(){
-  if( typeof cordova === 'undefined' || cordova === null ){ 
+  if( typeof cordova === 'undefined' || cordova === null ){
       myApp.prompt('Enter your address:', '', function (value) {
         changeAddress(value);
       });
@@ -55,7 +55,7 @@ function qrScan(){
  }
 }
 // Handle Cordova Device Ready Event
-$$(document).on('deviceready', function() {
+$(document).ready(function() {
     console.log("Device is ready!");
 
     var storedData = myApp.formGetData('walletInfo');
@@ -77,8 +77,8 @@ var mainView = myApp.addView('.view-main', {
 // Add 'refresh' listener on it
 var ptrHome = $$('.homeContent');
 ptrHome.on('refresh', function (e) {
-    renderBalance(address);
-    renderTransactions(address);
+    renderBalance(contract, address);
+    renderTransactions(contract, address);
     myApp.pullToRefreshDone();
 });
 $$('.changeAddress').on('click', function (e) {

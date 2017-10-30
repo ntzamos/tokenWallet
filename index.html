@@ -1,74 +1,103 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
+    <!--
+        Customize this policy to fit your own app's needs. For more guidance, see:
+            https://github.com/apache/cordova-plugin-whitelist/blob/master/README.md#content-security-policy
+        Some notes:
+            * gap: is required only on iOS (when using UIWebView) and is needed for JS->native communication
+            * https://ssl.gstatic.com is required only on Android and is needed for TalkBack to function properly
+            * Disables use of inline scripts in order to mitigate risk of XSS vulnerabilities. To change this:
+                * Enable inline JS: add 'unsafe-inline' to default-src
+        -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *"> -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src data: gap: https://ssl.gstatic.com 'unsafe-eval' *; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' 'unsafe-eval' http://www.example.com; connect-src 'self' http://www.example.com"> -->
+    <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self' data: gap: https://ssl.gstatic.com 'unsafe-eval'; style-src 'self' 'unsafe-inline'; media-src *; connect-src http://www.example.com"> -->
+    <meta http-equiv="Content-Security-Policy" content="default-src *; img-src data *; style-src 'self' http://* 'unsafe-inline'; script-src 'self' http://* 'unsafe-inline' 'unsafe-eval'" />
+
     <!-- Required meta tags-->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, minimal-ui">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+
     <!-- Your app title -->
-    <title>My App</title>
-    <!-- Path to Framework7 iOS CSS theme styles-->
-    <link rel="stylesheet" href="lib/framework7/css/framework7.ios.min.css">
-    <!-- Path to Framework7 iOS related color styles -->
-    <link rel="stylesheet" href="lib/framework7/css/framework7.ios.colors.min.css">
-    <!-- Path to Framework7 Icon set -->
+    <title>My Wallet</title>
+
+    <!-- This template defaults to the iOS CSS theme. To support both iOS and material design themes, see the Framework7 Tutorial at the link below:
+        http://www.idangero.us/framework7/tutorials/maintain-both-ios-and-material-themes-in-single-app.html
+     -->
+
+    <link rel="stylesheet" href="lib/framework7/css/framework7.material.min.css">
+    <link rel="stylesheet" href="lib/framework7/css/framework7.material.colors.min.css">
     <link rel="stylesheet" href="lib/framework7/css/framework7.icons.css">
-    <!-- Path to your custom app styles-->
-    <!-- <link rel="stylesheet" href="css/style.css"> -->
-  </head>
-  <body>
+
+    <link rel="stylesheet" href="css/styles.css">
+
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
     <!-- Status bar overlay for full screen mode (PhoneGap) -->
     <div class="statusbar-overlay"></div>
+
+    <div class="popup popup-address">
+      <div class="content-block">
+        <p>Your address:<br/>
+          <span id="myaddress"></span>
+        </p>
+        <div id="myqrcode"></div>
+        <br/>
+        <a href="#" class="button button-fill color-blue close-popup">Done</a>
+      </div>
+    </div>
     <!-- Panels overlay-->
     <div class="panel-overlay"></div>
     <!-- Left panel with reveal effect-->
-    <div class="panel panel-left panel-cover">
-      <div class="content-block">
-        <p>Left panel content goes here</p>
-      </div>
+    <div class="panel panel-left panel-reveal">
+        <div class="content-block">
+            <p><a href="#home" class="tab-link active close-panel">Balance</a></p>
+            <p><a href="#history" class="tab-link close-panel">History</a></p>
+            <p><a href="#send" class="tab-link close-panel">Send</a></p>
+        </div>
     </div>
-    <!-- Views -->
     <div class="views">
-      <!-- Your main view, should have "view-main" class -->
       <div class="view view-main">
-        <!-- Top Navbar-->
         <div class="navbar">
           <div class="navbar-inner">
-            <!-- We need cool sliding animation on title element, so we have additional "sliding" class -->
-            <div class="center sliding">Awesome App</div>
+            <div class="left">
+                <a href="#" class="link icon-only open-panel"><i class="icon icon-bars"></i></a>
+            </div>
             <div class="right">
-              <!--
-                Right link contains only icon - additional "icon-only" class
-                Additional "open-panel" class tells app to open panel when we click on this link
-              -->
-              <a href="#" class="link icon-only open-panel"><i class="icon icon-bars"></i></a>
+                <a href="#" class="changeAddress link icon-only"><i class="icon icon-qr"></i></a>
+            </div>
+          </div>
+          <div id="balance"></div>
+          <div id="actions">
+            <div class="row">
+              <div class="button but send">Send</div>
+              <div data-popup=".popup-address" class="open-popup button but receive">Receive</div>
             </div>
           </div>
         </div>
-        <!-- Pages container, because we use fixed-through navbar and toolbar, it has additional appropriate classes-->
-        <div class="pages navbar-through toolbar-through">
-          <!-- Page, "data-page" contains page name -->
+        <div class="pages">
           <div data-page="index" class="page">
-            <!-- Scrollable page content -->
-            <div class="page-content">
-              <p>Page content goes here</p>
-              <!-- Link to another page -->
-              <a href="about.html">About app</a>
-            </div>
-          </div>
-        </div>
-        <!-- Bottom Toolbar-->
-        <div class="toolbar">
-          <div class="toolbar-inner">
-            <!-- Toolbar links -->
-            <a href="#" class="link">Link 1</a>
-            <a href="#" class="link">Link 2</a>
+            <div class="page-content homeContent pull-to-refresh-content">
+              <div class="pull-to-refresh-layer"><div class="pull-to-refresh-arrow"></div></div>
+              <div class="content-block">
+                <div class="content-block-title">Transaction History</div>
+                <div class="list-block">
+                  <ul id="myTransactions">
+                    <div class="preloader"></div>
+                  </ul>
+                </div>
+              </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Path to jQuery -->    
     <script src="js/jquery-3.2.1.min.js"></script>
     <script src="js/qrcode.min.js"></script>
 
@@ -78,50 +107,11 @@
     <script src="js/popper.min.js"></script>
     <script src="js/bootstrap.min.js"></script>
     <script src="js/jquery.p2r.min.js"></script>
+    <script src="js/script.js"></script>
 
-    <!-- Path to Framework7 Library JS-->
+    <!-- <script type="text/javascript" src="cordova.js"></script> -->
     <script type="text/javascript" src="lib/framework7/js/framework7.min.js"></script>
-    <!-- Path to web3.js-->
-    <script type="text/javascript" src="js/web3.js"></script>
-    <!-- Path to main js -->
-    <script type="text/javascript" src="js/script.js"></script>
-    <script>
-      // Initialize app and store it to myApp variable for futher access to its methods
-      var myApp = new Framework7();
+    <script type="text/javascript" src="js/my-app.js"></script>
+</body>
 
-      // We need to use custom DOM library, let's save it to $$ variable:
-      var $$ = Dom7;
-
-      // Add view
-      var mainView = myApp.addView('.view-main', {
-        // Because we want to use dynamic navbar, we need to enable it for this view:
-        dynamicNavbar: true
-      });
-
-      // Now we need to run the code that will be executed only for About page.
-
-      // Option 1. Using page callback for page (for "about" page in this case) (recommended way):
-      myApp.onPageInit('about', function (page) {
-        // Do something here for "about" page
-
-      })
-
-      // Option 2. Using one 'pageInit' event handler for all pages:
-      $$(document).on('pageInit', function (e) {
-        // Get page data from event data
-        var page = e.detail.page;
-
-        if (page.name === 'about') {
-          // Following code will be executed for page with data-page attribute equal to "about"
-          myApp.alert('Here comes About page');
-        }
-      })
-
-      // Option 2. Using live 'pageInit' event handlers for each page
-      $$(document).on('pageInit', '.page[data-page="about"]', function (e) {
-        // Following code will be executed for page with data-page attribute equal to "about"
-        myApp.alert('Here comes About page');
-      })
-    </script>
-  </body>
 </html>
