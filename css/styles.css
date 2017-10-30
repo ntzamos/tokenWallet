@@ -1,0 +1,80 @@
+/*
+   statusbar-overlay sets the background color for the overlay. Black text is the default when the statusbar plugin is not added. When the
+   statusbar plugin is added, it also adds default setting to make the content white via:
+
+       <preference name="StatusBarStyle" value="lightcontent"/>
+
+   Setting the background color to black will allow the default light content (white text/icons) to show on it. The statusbar plugin is included
+   in the config.xml file and will be added by the CLI when you build locally.
+
+   See https://github.com/apache/cordova-plugin-statusbar
+*/
+
+#actions a.button {
+    height: 56px;
+    line-height: 56px;
+    background: #1565C0;
+}
+.pull-to-refresh-content.pull-to-refresh-no-navbar {
+  margin-top: 100px !important;
+}
+.navbar-inner {
+  height: 56px;
+}
+.navbar {
+  background: #1C497A;
+  height: auto;
+}
+/*.content-block {
+  background: #fff;
+}*/
+i.icon.icon-qr {
+  width: 24px;
+  height: 24px;
+  background-image: url(../qr.png);
+}
+#myTransactions .preloader{
+  margin: 0px auto;
+  display: block;
+}
+.item-content {
+  font-size: 80%;
+}
+.panel {
+  background: url(../bg.jpg);
+  background-size: 75%;
+}
+.panel .content-block, .content-block {
+  padding: 0 !important;
+}
+.content-block {
+  margin: 0px 0;
+}
+
+.popup .content-block{
+  margin: 50px 0px !important;
+  text-align: center;
+}
+#myqrcode img{
+  margin: 0 auto;
+}
+.panel a {
+  border-bottom: 1px solid white;
+  font-size: 20px;
+  background: white;
+  padding: 7px 0px;
+  margin-bottom: -13px;
+  width: 100%;
+  display: block;
+  font-weight: 300;
+  text-indent: 7px;
+}
+.panel a:active {
+  background: #dedede;
+}
+.panel a {
+  color: black;
+}
+.statusbar-overlay {
+    background: #000000;
+}
