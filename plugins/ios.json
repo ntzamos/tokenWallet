@@ -1,0 +1,25 @@
+{
+  "prepare_queue": {
+    "installed": [],
+    "uninstalled": []
+  },
+  "config_munge": {
+    "files": {}
+  },
+  "installed_plugins": {
+    "cordova-plugin-console": {
+      "PACKAGE_NAME": "com.token.wallet"
+    },
+    "cordova-plugin-statusbar": {
+      "PACKAGE_NAME": "com.token.wallet"
+    },
+    "cordova-plugin-whitelist": {
+      "PACKAGE_NAME": "com.token.wallet"
+    },
+    "phonegap-plugin-barcodescanner": {
+      "CAMERA_USAGE_DESCRIPTION": " ",
+      "PACKAGE_NAME": "com.token.wallet"
+    }
+  },
+  "dependent_plugins": {}
+}
