@@ -56,6 +56,28 @@ function qrScan(){
    );
  }
 }
+
+$(".showaddress").click(function(){
+  var options = {
+    message: address, // not supported on some apps (Facebook, Instagram)
+    subject: 'My address', // fi. for email
+    files: ['', ''], // an array of filenames either locally or remotely
+    url: '',
+    chooserTitle: 'Share address' // Android only, you can override the default share sheet title
+  }
+
+  var onSuccess = function(result) {
+    console.log("Share completed? " + result.completed); // On Android apps mostly return false even while it's true
+    console.log("Shared to app: " + result.app); // On Android result.app is currently empty. On iOS it's empty when sharing is cancelled (result.completed=false)
+  }
+
+  var onError = function(msg) {
+    console.log("Sharing failed with message: " + msg);
+  }
+
+  window.plugins.socialsharing.shareWithOptions(options, onSuccess, onError);
+
+});
 // Handle Cordova Device Ready Event
 $(document).ready(function() {
     console.log("Device is ready!");
